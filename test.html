@@ -10,156 +10,157 @@
       overflow: hidden; //隐藏body窗口区域滚动条
     }
   </style>
-<script src="three.min.js"></script>
-<script src="OrbitControls.js"></script>
+  <script src="three.min.js"></script>
+  <script src="OrbitControls.js"></script>
 </head>
 
 <body>
   <script>
-    var scene = new THREE.Scene();
-
-    var SS = 1;
-    var box = new THREE.SphereGeometry(25 * SS, 50 * SS, 50 * SS);
-
-
-    var material = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      side: THREE.BackSide,
-    });
-    var mesh = new THREE.Mesh(box, material);
-    scene.add(mesh);
-
-    var textureLoader = new THREE.TextureLoader();
-
-    var texture = textureLoader.load('./苏州城夜景.jpg', function(obj) {
-      render();
-    });
-    mesh.material.map = texture;
-
-
-
-    var textureTree = new THREE.TextureLoader().load("孔明灯.png");
-	
-	var raycaster = new THREE.Raycaster();
-	var mouse = new THREE.Vector2();
-
-	
-
-    var group = new THREE.Group();
-
-    var L = 50
-    for (let i = 0; i < 800 * 3; i++) {
-      var spriteMaterial = new THREE.SpriteMaterial({
-        map: textureTree,
+    var scene, camera, renderer, light, SS = 1, group, raycaster, mouse;
+    function init() {
+      scene = new THREE.Scene();
+      var box = new THREE.SphereGeometry(25 * SS, 50 * SS, 50 * SS);
+      var material = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        side: THREE.BackSide,
       });
+      var mesh = new THREE.Mesh(box, material);
+      var textureLoader = new THREE.TextureLoader();
+      var texture = textureLoader.load('./sz.jpg', function (obj) {
+        //render();
+      });
+      mesh.material.map = texture;
+      scene.add(mesh);
 
-      var sprite = new THREE.Sprite(spriteMaterial);
-      group.add(sprite);
+      // var light = new THREE.PointLight(0xffffff, 0.5);
+      // light.position.set(400, 200, 300);
 
-      sprite.scale.set(0.6, 0.75, 0.08);
-      var k1 = Math.random() - 0.5;
-      var k2 = Math.random() - 0.5;
+      camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
+      camera.position.set(2.64, 1.56, -6.16);
+      //camera.lookAt(scene.position);
 
-
-      sprite.position.set(L * k1, L * Math.random() - 25, L * k2)
-
-
+      initRender()
+      
+      renderer.render(scene, camera)
     }
-    scene.add(group);
+
+    function initRender(){
+      renderer = new THREE.WebGLRenderer({
+        antialias: true
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+    }
+
+    //orbit相机视角控制器
+    function initOrbit() {
+      //var controls = new THREE.OrbitControls(camera, renderer.domElement);
+      var controls = new THREE.OrbitControls(camera);
+      controls.enablePan = false;
+      controls.enableZoom = false;
+      controls.minPolarAngle = Math.PI / 4;
+      controls.maxPolarAngle = 2 * Math.PI / 3;
+      renderer.render(scene, camera);
+    }
 
 
+    function initSpite() {
+      var textureTree = new THREE.TextureLoader().load("apple.png");
+      raycaster = new THREE.Raycaster();
+      mouse = new THREE.Vector2();
+      group = new THREE.Group();
+      var L = 50
+      for (let i = 0; i < 200 * 3; i++) {
+        var spriteMaterial = new THREE.SpriteMaterial({
+          map: textureTree,
+        });
+        var sprite = new THREE.Sprite(spriteMaterial);
+        group.add(sprite);
+        sprite.scale.set(0.6, 0.75, 0.08);
+        var k1 = Math.random() - 0.5;
+        var k2 = Math.random() - 0.5;
+        sprite.position.set(L * k1, L * Math.random() - 25, L * k2)
+      }
+      scene.add(group);
+    }
 
-    var AxesHelper = new THREE.AxesHelper(100);
 
-
-
-    var point = new THREE.PointLight(0xffffff, 0.5);
-    point.position.set(400, 200, 300);
-
-
-
-
-
-    var width = window.innerWidth;
-    var height = window.innerHeight;
-    var k = width / height;
-
-    var camera = new THREE.PerspectiveCamera(60, width / height, 1, 1000);
-
-
-    camera.position.set(2.64, 1.56, -6.16);
-
-
-    camera.lookAt(scene.position);
-
-    var renderer = new THREE.WebGLRenderer({
-      antialias: true
-    });
-    renderer.setSize(width, height);
-
-    document.body.appendChild(renderer.domElement);
     var clock = new THREE.Clock()
     var FPS = 30;
-    var 刷新时间 = 1 / FPS;
+    var renderTime = 1 / FPS;
     var timeS = 0;
-
-    function render() {
-
+    function laternFly() {
       var t = clock.getDelta();
-	  window.addEventListener( "mousemove", onDocumentMouseMove, false );
-	  
-
-
       group.children.forEach(sprite => {
-
-
-        sprite.position.y += 50 * t * 0.02;
-
+        sprite.position.y += 30 * t * 0.02;
         if (sprite.position.y > 25) {
-
           sprite.position.y = -25;
         }
       });
-
       timeS = timeS + t;
-      if (timeS > 刷新时间) {
+      if (timeS > renderTime) {
         renderer.render(scene, camera);
         scene.rotateY(0.003);
         timeS = 0;
       }
-      requestAnimationFrame(render);
-
     }
-    render();
-    var controls = new THREE.OrbitControls(camera);
-    controls.enablePan = false;
-    controls.enableZoom = false;
-    controls.minPolarAngle = Math.PI / 4;
-    controls.maxPolarAngle = 2 * Math.PI / 3;
-	
-	function onDocumentMouseMove ( event ) {
-	    event.preventDefault();
-
-		// 将鼠标位置归一化为设备坐标。x 和 y 方向的取值范围是 (-1 to +1)
-
-		mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-		mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-		raycaster.setFromCamera( mouse, camera );
-		  var intersects = raycaster.intersectObjects( scene.children[1].children ,true );//scene.children[1].children 
-		  if ( intersects.length > 0 ) {
-		  intersects[0].object.material.map=new THREE.TextureLoader().load("苏州城夜景.jpg");
-		  }
-
-	}
 
 
 
-    
-    window.onresize = function() {
+    function animate() {
+      //renderer.render(scene, camera);
+      //clearRenderer()
+      laternFly()
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener("mousemove", onDocumentMouseMove, false);
+
+    var imageArray=[]
+
+    var uniqueObj = undefined
+    function onDocumentMouseMove(event) {
+      event.preventDefault();
+      // 将鼠标位置归一化为设备坐标。x 和 y 方向的取值范围是 (-1 to +1)
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+      var intersects = raycaster.intersectObjects(scene.children[1].children, true);//scene.children[1].children 
+      if (intersects.length > 0) {
+        if (uniqueObj != intersects[0].object) {
+          var location = Math.random()*30
+          intersects[0].object.material.map.dispose();
+          //intersects[0].object.geometry.dispose()
+          intersects[0].object.material.map = new THREE.TextureLoader().load("sz.jpg");
+          uniqueObj = intersects[0].object
+          //renderer.render(scene, camera);
+        }
+
+      }
+    }
+    window.onresize = function () {
       renderer.setSize(window.innerWidth, window.innerHeight);
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
     };
+
+    //清空渲染器缓存
+    function clearRenderer() {
+      renderer.dispose();
+      renderer.forceContextLoss();
+      renderer.context = null;
+      renderer.domElement = null;
+      renderer = null;
+    }
+
+    //当窗口加载完成时,执行上述所有方法
+    window.onload = function start() {
+      init();
+      initSpite();
+      initOrbit();
+      //laternFly()
+      animate();
+    }
   </script>
 </body>
 
