@@ -97,12 +97,14 @@
     var timeS = 0;
     function laternFly() {
       var t = clock.getDelta();
-      group.children.forEach(sprite => {
-        sprite.position.y += 20 * t * 0.02;
-        if (sprite.position.y > 25) {
-          sprite.position.y = -25;
-        }
-      });
+      if (scene.autoUpdate) {
+        group.children.forEach(sprite => {
+          sprite.position.y += 20 * t * 0.02;
+          if (sprite.position.y > 25) {
+            sprite.position.y = -Math.random() * 25;
+          }
+        });
+      }
       timeS = timeS + t;
       if (timeS > renderTime) {
         renderer.render(scene, camera);
@@ -110,9 +112,6 @@
         timeS = 0;
       }
     }
-
-
-
     function animate() {
       //renderer.render(scene, camera);
       //clearRenderer()
@@ -140,15 +139,15 @@
       event.preventDefault();
       scene.autoUpdate = false
     }
-    function onDocumentTouchStart(event){
+    function onDocumentTouchStart(event) {
       //event.preventDefault();
       scene.autoUpdate = false
     }
-    function onDocumentTouchMove(event){
+    function onDocumentTouchMove(event) {
       //event.preventDefault();
       scene.autoUpdate = false
     }
-    function onDocumentTouchEnd(event){
+    function onDocumentTouchEnd(event) {
       //event.preventDefault();
       scene.autoUpdate = true
     }
