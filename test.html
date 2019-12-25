@@ -2,9 +2,11 @@
 <html lang="en">
 
 <head>
-  
-  <meta charset="UTF-8" name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+  <meta charset="UTF-8" name="viewport"
+    content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>圣诞快乐</title>
+
   <style>
     body {
       margin: 0;
@@ -57,11 +59,11 @@
     //orbit相机视角控制器
     function initOrbit() {
       //var controls = new THREE.OrbitControls(camera, renderer.domElement);
-      controls = new THREE.OrbitControls(camera);
+      window.controls = new THREE.OrbitControls(camera);
       controls.enablePan = false;
       controls.enableZoom = true;
       controls.minDistance = 0;
-      controls.maxDistance = 80;
+      controls.maxDistance = 25;
       controls.minPolarAngle = Math.PI / 4;
       controls.maxPolarAngle = 2 * Math.PI / 3;
       renderer.render(scene, camera);
@@ -122,7 +124,10 @@
     document.addEventListener("mousemove", onDocumentMouseMove, false);
     document.addEventListener('mousedown', onDocumentMouseDown, false);
     document.addEventListener('mouseup', onDocumentMouseUp, false);
-    document.addEventListener( 'wheel', onMouseWheel, false );
+    document.addEventListener('wheel', onMouseWheel, false);
+    document.addEventListener('touchstart', onDocumentTouchStart, false);
+    document.addEventListener('touchmove', onDocumentTouchMove, false);
+    document.addEventListener('touchend', onDocumentTouchEnd, false);
 
     var imageArray = []
     function getImage() {
@@ -131,8 +136,21 @@
       }
     }
 
-    function onMouseWheel(event){
-      scene.autoUpdate=false
+    function onMouseWheel(event) {
+      event.preventDefault();
+      scene.autoUpdate = false
+    }
+    function onDocumentTouchStart(event){
+      //event.preventDefault();
+      scene.autoUpdate = false
+    }
+    function onDocumentTouchMove(event){
+      //event.preventDefault();
+      scene.autoUpdate = false
+    }
+    function onDocumentTouchEnd(event){
+      //event.preventDefault();
+      scene.autoUpdate = true
     }
 
 
@@ -156,12 +174,12 @@
       }
     }
     function onDocumentMouseDown(event) {
-      scene.autoUpdate=false
+      scene.autoUpdate = false
     }
     function onDocumentMouseUp(event) {
-      scene.autoUpdate=true
+      scene.autoUpdate = true
     }
-    
+
     window.onresize = function () {
       renderer.setSize(window.innerWidth, window.innerHeight);
       camera.aspect = window.innerWidth / window.innerHeight;
